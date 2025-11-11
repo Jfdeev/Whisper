@@ -1,0 +1,1 @@
+ALTER TABLE "rooms" ADD COLUMN "content" text DEFAULT '';

@@ -29,6 +29,27 @@
       "when": 1759144397529,
       "tag": "0003_crazy_iron_lad",
       "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "7",
+      "when": 1762309678786,
+      "tag": "0004_rapid_shooting_star",
+      "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1762339074178,
+      "tag": "0005_big_fixer",
+      "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1762353090779,
+      "tag": "0006_freezing_killer_shrike",
+      "breakpoints": true
     }
   ]
 }

@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { ArrowLeft, Mic, Square, Upload, Loader, Play, Pause } from "lucide-react";
 import { useRef, useState } from "react";
-import { Link, useNavigate } from "react-router-dom";
+import { Link, useNavigate, useSearchParams } from "react-router-dom";
 import { toast } from "sonner";
 
 type CreateRoomResponse = {
@@ -29,6 +29,8 @@ export function CreateRoomFromAudio() {
     const audioRef = useRef<HTMLAudioElement | null>(null);
     const timerRef = useRef<NodeJS.Timeout | null>(null);
     const navigate = useNavigate();
+    const [searchParams] = useSearchParams();
+    const folderId = searchParams.get('folderId');
 
     function stopRecording() {
         setIsRecording(false);
@@ -47,11 +49,20 @@ export function CreateRoomFromAudio() {
         setIsProcessing(true);
         
         try {
+            const token = localStorage.getItem('token');
             const formData = new FormData();
             formData.append("file", audio, 'audio.webm');
+            
+            // Adiciona folderId se estiver presente
+            if (folderId) {
+                formData.append("folderId", folderId);
+            }
 
             const response = await fetch(`http://localhost:3333/rooms/from-audio`, {
                 method: "POST",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
                 body: formData,
             });
 

@@ -8,10 +8,12 @@ import {
     boolean
  } from "drizzle-orm/pg-core";
 import { rooms } from "./rooms.ts";
+import { users } from "./users.ts";
 
 export const activities = pgTable("activities", {
     id: uuid().primaryKey().defaultRandom(),
     roomId: uuid().notNull().references(() => rooms.id),
+    userId: uuid('user_id').notNull().references(() => users.id, { onDelete: 'cascade' }),
     title: text().notNull(),
     description: text(),
     questions: jsonb().notNull(), // Array de questões com alternativas

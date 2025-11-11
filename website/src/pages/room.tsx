@@ -22,7 +22,6 @@ import {
   Users,
   AlertCircle,
   BrainCircuit,
-  Ear,
   Clock,
   FileText
 } from "lucide-react";
@@ -265,16 +264,6 @@ export function Room() {
                 Voltar às salas
               </Button>
             </Link>
-
-            <Link to={`/audio/${room.id}`}>
-              <Button
-                variant="outline"
-                className="mb-6 text-gray-600 hover:text-blue-600 border-gray-300 hover:border-blue-300"
-              >
-                <Ear className="w-4 h-4 mr-2" />
-                Gravar Audio
-              </Button>
-            </Link>
           </div>
 
           <div className="bg-white rounded-2xl shadow-lg p-8 border border-gray-200">
@@ -314,16 +303,6 @@ export function Room() {
             </div>
             
             <div className="flex items-center space-x-4">
-              <Link to={`/room/${roomId}/record-audio`}>
-                <Button 
-                  variant="outline"
-                  className="flex items-center space-x-2 border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                >
-                  <Ear className="w-4 h-4" />
-                  <span>Gravar Áudio</span>
-                </Button>
-              </Link>
-              
               <Button 
                 onClick={() => {
                   createActivityMutation.mutate();

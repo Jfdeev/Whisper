@@ -16,6 +16,7 @@ export const getRoomRoute: FastifyPluginAsyncZod = async (app) => {
         id: rooms.id,
         name: rooms.name,
         description: rooms.description,
+        content: rooms.content,
         created_at: rooms.createdAt,
       })
       .from(rooms)

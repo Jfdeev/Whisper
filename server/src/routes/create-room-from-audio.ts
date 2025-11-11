@@ -2,20 +2,29 @@ import { FastifyPluginCallbackZod } from 'fastify-type-provider-zod'
 import { transcribeAudio, generateEmbeddings, generateRoomInfo } from '../services/gemini.ts'
 import { db } from '../db/connection.ts'
 import { schema } from '../db/schema/index.ts'
+import { getUserFromRequest } from '../types/index.ts'
 
 export const createRoomFromAudioRoute: FastifyPluginCallbackZod = (app) => {
   app.post('/rooms/from-audio', {},
     async (request, reply) => {
       try {
-        const audio = await request.file();
+        // Autenticação
+        await request.jwtVerify()
+        const userId = getUserFromRequest(request).sub
+        
+        // Extrair folderId do form data se presente
+        const data = await request.file();
 
-        if (!audio) {
+        if (!data) {
           return reply.status(400).send({ error: 'Audio file is required' });
         }
         
-        const audioBuffer = await audio.toBuffer();
+        const audioBuffer = await data.toBuffer();
         const audioBase64 = audioBuffer.toString('base64');
-        const mimeType = audio.mimetype;
+        const mimeType = data.mimetype;
+        
+        // Pegar folderId dos fields do multipart
+        const folderId = data.fields.folderId ? (data.fields.folderId as any).value : null;
 
         const transcription = await transcribeAudio(audioBase64, mimeType);
         
@@ -32,6 +41,8 @@ export const createRoomFromAudioRoute: FastifyPluginCallbackZod = (app) => {
         const roomResult = await db.insert(schema.rooms).values({
           name: roomInfo.title,
           description: roomInfo.description,
+          userId,
+          folderId: folderId || null,
         }).returning();
 
         const room = roomResult[0];

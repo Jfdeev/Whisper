@@ -51,61 +51,14 @@ export async function generateEmbeddings(text: string) {
     return response.embeddings[0].values;
 }
 
-export async function generateAnswer(question: string, transcriptions: string[]) {
-  const context = transcriptions.join('\n\n');
-
-  const prompt = `Você é um assistente educacional especializado em explicar conceitos de forma didática e clara.
-
-CONTEXTO DA AULA: ${context}
-
-PERGUNTA DO ALUNO: ${question}
-
-INSTRUÇÕES PARA RESPONDER:
-
-1. ANÁLISE DO CONTEXTO:
-   - Identifique o TEMA PRINCIPAL da aula (ex: banco de dados, programação, matemática, etc.)
-   - Extraia os CONCEITOS-CHAVE sendo discutidos
-   - Identifique se a pergunta é sobre um conceito GERAL ou algo ESPECÍFICO da aula
-
-2. ESTRATÉGIA DE RESPOSTA:
-
-   PARA CONCEITOS GERAIS (ex: "O que é uma tabela?", "Como funciona SQL?"):
-   - Responda como um professor experiente
-   - Dê uma explicação clara e didática do conceito
-   - Use linguagem acessível e exemplos práticos
-   - Comece com: "Com base no tema da aula sobre [tema], posso explicar que..."
-   - NÃO cite frases específicas da transcrição
-
-   PARA PERGUNTAS ESPECÍFICAS (ex: "O professor mencionou 32 tabelas, por quê?"):
-   - Cite o contexto específico: "Durante a aula foi mencionado que..."
-   - Explique o contexto e complete com conhecimento educativo
-
-   PARA PERGUNTAS SEM RELAÇÃO:
-   - "Esta pergunta não se relaciona com o conteúdo da aula sobre [tema]."
-
-3. ESTILO DA RESPOSTA:
-   - Tom educativo, paciente e encorajador
-   - Linguagem clara, sem jargões desnecessários
-   - Estrutura: Definição → Explicação → Exemplo prático (quando apropriado)
-   - Português Brasil coloquial mas profissional
-   - Parágrafos normais, sem formatação especial
-
-4. EXEMPLO DE BOA RESPOSTA:
-   "Com base no tema da aula sobre banco de dados, posso explicar que uma tabela é uma estrutura fundamental onde organizamos dados relacionados. Pense nela como uma planilha do Excel, onde cada linha representa um registro (como dados de uma pessoa) e cada coluna representa um atributo específico (como nome, idade, email). Na prática, se você tem um sistema de escola, teria uma tabela para alunos, outra para professores e outra para disciplinas, cada uma armazenando informações específicas de sua categoria."
-
-Responda de forma educativa e clara:`.trim();
-
+export async function chatWithAI(prompt: string) {
   const response = await gemini.models.generateContent({
     model,
-    contents: [
-      {
-        text: prompt
-      }
-    ]
-  })
+    contents: [{ text: prompt }]
+  });
 
-  if(!response.text) {
-    throw new Error("Erro ao gerar a resposta");
+  if (!response.text) {
+    throw new Error('Erro ao gerar resposta do chat');
   }
 
   return response.text;
@@ -258,4 +211,76 @@ Responda apenas o JSON válido:`.trim();
       ]
     };
   }
+}
+
+export async function continueTextWithAI(existingText: string) {
+  const prompt = `Você é um assistente de escrita inteligente. Continue o texto abaixo de forma natural e coerente.
+
+TEXTO EXISTENTE:
+${existingText}
+
+INSTRUÇÕES:
+1. Analise o contexto e o tema do texto
+2. Continue escrevendo de forma natural, mantendo o mesmo estilo e tom
+3. Adicione aproximadamente 2-3 parágrafos de continuação
+4. Seja claro, objetivo e relevante ao tema
+5. NÃO repita o texto existente
+6. NÃO adicione títulos ou formatação especial
+7. Responda APENAS o texto de continuação
+
+Continue o texto:`.trim();
+
+  const response = await gemini.models.generateContent({
+    model,
+    contents: [{ text: prompt }]
+  });
+
+  if (!response.text) {
+    throw new Error('Erro ao continuar texto');
+  }
+
+  return response.text;
+}
+
+export async function generateSummary(content: string) {
+  const prompt = `Você é um especialista em criar resumos educacionais claros e estruturados.
+
+CONTEÚDO PARA RESUMIR:
+${content}
+
+INSTRUÇÕES:
+1. Analise todo o conteúdo fornecido
+2. Identifique os pontos principais e conceitos-chave
+3. Crie um resumo estruturado e organizado
+4. Use bullet points para facilitar a leitura
+5. Mantenha linguagem clara e objetiva
+6. Português Brasil
+7. Tamanho: entre 200-400 palavras
+
+Formato esperado:
+# Resumo
+
+## Principais Conceitos
+- Conceito 1: breve explicação
+- Conceito 2: breve explicação
+
+## Pontos Importantes
+- Ponto relevante 1
+- Ponto relevante 2
+
+## Conclusão
+Síntese final do conteúdo
+
+Gere o resumo:`.trim();
+
+  const response = await gemini.models.generateContent({
+    model,
+    contents: [{ text: prompt }]
+  });
+
+  if (!response.text) {
+    throw new Error('Erro ao gerar resumo');
+  }
+
+  return response.text;
 }

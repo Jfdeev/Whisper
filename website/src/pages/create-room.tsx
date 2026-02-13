@@ -17,6 +17,7 @@ import { Calendar, Mic, Plus, Trash2, Users, X } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/lib/api";
 
 type Room = {
   id: string;
@@ -43,7 +44,7 @@ export function CreateRoom() {
   } = useQuery<Rooms>({
     queryKey: ["get-rooms"],
     queryFn: async () => {
-      const res = await fetch("http://localhost:3333/rooms");
+      const res = await fetch(`${API_BASE_URL}/rooms`);
       if (!res.ok) throw new Error("Erro ao buscar salas");
       const data: Rooms = await res.json();
       return data;
@@ -56,7 +57,7 @@ export function CreateRoom() {
     { name: string; description: string }
   >({
     mutationFn: async (payload: { name: string; description: string }) => {
-      const res = await fetch("http://localhost:3333/rooms", {
+      const res = await fetch(`${API_BASE_URL}/rooms`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -82,7 +83,7 @@ export function CreateRoom() {
 
   const deleteRoomMutation = useMutation({
     mutationFn: async (roomId: string) => {
-      const res = await fetch(`http://localhost:3333/rooms/${roomId}`, {
+      const res = await fetch(`${API_BASE_URL}/rooms/${roomId}`, {
         method: "DELETE",
       });
 

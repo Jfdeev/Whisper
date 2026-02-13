@@ -112,13 +112,6 @@ Responda de forma educativa e clara:`.trim();
 }
 
 export async function generateRoomInfo(transcription: string) {
-  const { GoogleGenAI } = await import('@google/genai');
-  const { env } = await import('../env.ts');
-  
-  const gemini = new GoogleGenAI({
-    apiKey: env.GEMINI_API_KEY,
-  });
-
   const prompt = `Com base na transcrição de áudio fornecida, gere um título e descrição para uma sala de estudos/discussão.
 
 TRANSCRIÇÃO: ${transcription.substring(0, 2000)}...
@@ -139,7 +132,7 @@ Responda apenas o JSON, sem texto adicional:`.trim();
 
   try {
     const response = await gemini.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model,
       contents: [{ text: prompt }]
     });
 
@@ -163,15 +156,7 @@ Responda apenas o JSON, sem texto adicional:`.trim();
 
   } catch (error) {
     console.error('Error generating room info:', error);
-    
-    // Fallback: gera título e descrição básicos
-    const words = transcription.split(' ').slice(0, 10);
-    const preview = words.join(' ');
-    
-    return {
-      title: `Aula sobre ${preview.substring(0, 50)}...`,
-      description: `Sala criada automaticamente com base no conteúdo da aula. Discussão sobre: ${preview.substring(0, 150)}...`
-    };
+    throw new Error('Failed to generate room info from transcription');
   }
 }
 
@@ -215,7 +200,7 @@ Responda apenas o JSON válido:`.trim();
 
   try {
     const response = await gemini.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model,
       contents: [{ text: prompt }]
     });
 
@@ -236,26 +221,6 @@ Responda apenas o JSON válido:`.trim();
 
   } catch (error) {
     console.error('Error generating activity:', error);
-    
-    // Fallback: atividade básica
-    return {
-      title: "Atividade sobre o conteúdo da aula",
-      description: "Teste seus conhecimentos sobre os conceitos apresentados",
-      timeLimit: 15,
-      questions: [
-        {
-          id: 1,
-          question: "Com base no conteúdo apresentado, qual é o conceito principal discutido?",
-          alternatives: [
-            { id: "A", text: "Conceito relacionado ao tema" },
-            { id: "B", text: "Outro conceito importante" },
-            { id: "C", text: "Conceito secundário" },
-            { id: "D", text: "Conceito não relacionado" }
-          ],
-          correctAnswer: "A",
-          explanation: "Esta é a resposta correta baseada no conteúdo apresentado."
-        }
-      ]
-    };
+    throw new Error('Failed to generate activity from room context');
   }
 }

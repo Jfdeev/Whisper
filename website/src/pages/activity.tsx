@@ -15,6 +15,7 @@ import {
   AlertCircle
 } from "lucide-react";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/lib/api";
 
 type Activity = {
   id: string;
@@ -70,7 +71,7 @@ export function ActivityPage() {
   const { data: activity, isLoading, isError } = useQuery<Activity>({
     queryKey: ["activity", activityId],
     queryFn: async () => {
-      const response = await fetch(`http://localhost:3333/activities/${activityId}`);
+      const response = await fetch(`${API_BASE_URL}/activities/${activityId}`);
       if (!response.ok) throw new Error("Erro ao buscar atividade");
       return response.json();
     },
@@ -78,7 +79,7 @@ export function ActivityPage() {
 
   const submitMutation = useMutation<ActivityResult, Error, { userName: string; answers: Record<string, string> }>({
     mutationFn: async (payload) => {
-      const response = await fetch(`http://localhost:3333/activities/${activityId}/submit`, {
+      const response = await fetch(`${API_BASE_URL}/activities/${activityId}/submit`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
@@ -100,7 +101,7 @@ export function ActivityPage() {
   // Nova mutation para excluir a atividade
   const deleteActivityMutation = useMutation<void, Error>({
     mutationFn: async () => {
-      const response = await fetch(`http://localhost:3333/activities/${activityId}`, {
+      const response = await fetch(`${API_BASE_URL}/activities/${activityId}`, {
         method: "DELETE",
       });
       if (!response.ok) throw new Error("Erro ao excluir atividade");
@@ -143,9 +144,11 @@ export function ActivityPage() {
   useEffect(() => {
     const handleBeforeUnload = () => {
       if (showResults && activityId) {
-        // Usar sendBeacon para garantir que a request seja enviada mesmo se a página fechar
-        navigator.sendBeacon(`http://localhost:3333/activities/${activityId}`, 
-          JSON.stringify({ method: 'DELETE' }));
+        // sendBeacon não suporta DELETE, então usamos fetch com keepalive
+        fetch(`${API_BASE_URL}/activities/${activityId}`, {
+          method: 'DELETE',
+          keepalive: true,
+        });
       }
     };
 

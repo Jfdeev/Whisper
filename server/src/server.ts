@@ -25,7 +25,7 @@ import { deleteActivityRoute } from "./routes/delete-activity.ts";
 const app = fastify().withTypeProvider<ZodTypeProvider>();
 
 app.register(fastifyCors, {
-  origin: "*",
+  origin: env.CORS_ORIGIN,
   methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
   allowedHeaders: ["Content-Type", "Authorization"],
 });
@@ -57,6 +57,6 @@ app.register(getActivityRoute);
 app.register(submitActivityRoute);
 app.register(deleteActivityRoute);
 
-app.listen({ port: env.PORT }).then(() => {
-  console.log(`Server is running on http://localhost:${env.PORT}`);
+app.listen({ port: env.PORT, host: env.HOST }).then(() => {
+  console.log(`Server is running on http://${env.HOST}:${env.PORT}`);
 });

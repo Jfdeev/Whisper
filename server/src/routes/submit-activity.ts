@@ -23,8 +23,6 @@ export const submitActivityRoute: FastifyPluginCallbackZod = (app) => {
         const { activityId } = request.params;
         const { userName, answers } = request.body;
 
-        console.log('Submit activity request:', { activityId, userName, answers });
-
         // Busca a atividade para calcular a pontuação
         const activity = await db
           .select()
@@ -32,16 +30,12 @@ export const submitActivityRoute: FastifyPluginCallbackZod = (app) => {
           .where(eq(schema.activities.id, activityId))
           .limit(1);
 
-        console.log('Activity found:', activity.length > 0);
-
         if (activity.length === 0) {
           return reply.status(404).send({ error: "Atividade não encontrada" });
         }
 
         const activityData = activity[0];
         const questions = activityData.questions as any[];
-
-        console.log('Questions in activity:', questions.length);
 
         // Calcula a pontuação
         let score = 0;
@@ -67,10 +61,6 @@ export const submitActivityRoute: FastifyPluginCallbackZod = (app) => {
           });
         });
 
-        console.log('Questions processed:', questions.length);
-        console.log('Score:', score);
-        console.log('User answers:', answers);
-
         // Salva a resposta
         const responseResult = await db
           .insert(schema.activityResponses)
@@ -81,8 +71,6 @@ export const submitActivityRoute: FastifyPluginCallbackZod = (app) => {
             score,
           })
           .returning();
-
-        console.log('Response saved:', responseResult[0]);
 
         const response = responseResult[0];
 
@@ -101,8 +89,6 @@ export const submitActivityRoute: FastifyPluginCallbackZod = (app) => {
           results,
           completedAt: response.completedAt,
         };
-
-        console.log('Activity completed, showing feedback first');
 
         // Retorna o resultado com feedback (atividade NÃO é excluída ainda)
         return reply.status(201).send(responseData);

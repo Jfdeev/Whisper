@@ -4,6 +4,7 @@ import { ArrowLeft, Mic, Square, Upload, Loader, Play, Pause } from "lucide-reac
 import { useRef, useState } from "react";
 import { Navigate, useParams } from "react-router-dom";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/lib/api";
 
 type RoomParams = {
     id: string;
@@ -44,7 +45,7 @@ export function RecordRoomAudio() {
             const formData = new FormData();
             formData.append("file", audio, 'audio.webm');
 
-            const response = await fetch(`http://localhost:3333/rooms/${params.id}/upload-audio`, {
+            const response = await fetch(`${API_BASE_URL}/rooms/${params.id}/upload-audio`, {
                 method: "POST",
                 body: formData,
             });

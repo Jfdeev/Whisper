@@ -3,6 +3,7 @@ import { ArrowLeft, Mic, Square, Upload, Loader, Play, Pause } from "lucide-reac
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { toast } from "sonner";
+import { API_BASE_URL } from "@/lib/api";
 
 type CreateRoomResponse = {
     room: {
@@ -50,7 +51,7 @@ export function CreateRoomFromAudio() {
             const formData = new FormData();
             formData.append("file", audio, 'audio.webm');
 
-            const response = await fetch(`http://localhost:3333/rooms/from-audio`, {
+            const response = await fetch(`${API_BASE_URL}/rooms/from-audio`, {
                 method: "POST",
                 body: formData,
             });

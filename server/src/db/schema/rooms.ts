@@ -1,5 +1,3 @@
-import { time } from "console";
-import { create } from "domain";
 import { pgTable, text, timestamp, uuid } from "drizzle-orm/pg-core";
 
 

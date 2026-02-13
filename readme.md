@@ -63,52 +63,98 @@
 
 ### Pré-requisitos
 - Node.js 18+ instalado
-- PostgreSQL 14+ com extensão pgvector
-- Conta Google Cloud com Gemini AI habilitada
+- **Uma** das opções para banco:
+  - Docker + Docker Compose (recomendado), ou
+  - PostgreSQL 14+ (ou superior) com a extensão **pgvector** habilitada
+- Chave de API do **Google Gemini**
 
 ### 1. Clone o repositório
 ```bash
-git clone https://github.com/seu-usuario/whisper.git
-cd whisper
+git clone <URL_DO_REPOSITORIO>
+cd Nlw_agents
 ```
 
-### 2. Configuração do Backend
+## ▶️ Como rodar a aplicação (passo a passo)
+
+### Opção A — Banco via Docker (mais fácil)
+
+> Este `docker-compose.yml` sobe **apenas o PostgreSQL com pgvector**.
+
+1) Suba o banco:
+```bash
+cd server
+docker compose up -d
+```
+
+2) O banco vai ficar disponível em:
+- Host: `localhost`
+- Porta: `54323`
+- User: `docker`
+- Password: `docker`
+- Database: `agents`
+
+3) A extensão `vector` (pgvector) já é habilitada automaticamente pelo script [server/docker/setup.sql](server/docker/setup.sql).
+
+### Opção B — Criar o banco em um PostgreSQL local
+
+1) Crie o banco e habilite o pgvector:
+```sql
+CREATE DATABASE agents;
+\c agents
+
+CREATE EXTENSION IF NOT EXISTS vector;
+```
+
+2) Garanta que você tem um usuário/senha e a URL de conexão. Exemplo:
+`postgresql://<user>:<password>@localhost:5432/agents`
+
+---
+
+### 2. Configuração do Backend (API)
 
 ```bash
-# Navegue para o diretório do servidor
 cd server
 
 # Instale as dependências
 npm install
 
 # Configure as variáveis de ambiente
-cp .env.example .env
+copy .env.example .env
 ```
 
 **Configure seu `.env`:**
 ```env
-# Database
-DATABASE_URL="postgresql://user:password@localhost:5432/whisper"
-
-# Google Gemini AI
-GEMINI_API_KEY="sua_api_key_do_gemini"
-
 # Server
 PORT=3333
+
+# Database (Docker Compose)
+# DATABASE_URL=postgresql://docker:docker@localhost:54323/agents
+
+# Database (Postgres local)
+# DATABASE_URL=postgresql://user:password@localhost:5432/agents
+
+# Use UMA das opções acima:
+DATABASE_URL=postgresql://docker:docker@localhost:54323/agents
+
+# Google Gemini AI
+GEMINI_API_KEY=sua_api_key_do_gemini
 ```
 
 ```bash
 # Execute as migrações
 npm run db:migrate
 
+# (Opcional) Popular o banco com dados fake (reseta tudo)
+# Pare com CTRL+C quando terminar.
+npm run db:seed
+
 # Inicie o servidor de desenvolvimento
 npm run dev
 ```
 
-### 3. Configuração do Frontend
+### 3. Configuração do Frontend (Web)
 
 ```bash
-# Em outro terminal, navegue para o frontend
 cd website
 
 # Instale as dependências
@@ -118,29 +164,22 @@ npm install
 npm run dev
 ```
 
-### 4. Configuração do Banco de Dados
+### 4. Acessos e verificação
 
-```sql
--- Conecte ao PostgreSQL e execute:
-CREATE DATABASE whisper;
+- API: `http://localhost:3333`
+  - Healthcheck: `GET http://localhost:3333/health`
+- Web (Vite): normalmente `http://localhost:5173`
 
--- Conecte ao banco whisper
-\c whisper
-
--- Instale a extensão pgvector
-CREATE EXTENSION IF NOT EXISTS vector;
-```
+> Observação: o frontend faz requests para `http://localhost:3333` (URL hardcoded). Se você trocar a porta da API, vai precisar ajustar o frontend.
 
 ## 🔧 Scripts Disponíveis
 
 ### Backend (`/server`)
 ```bash
 npm run dev          # Desenvolvimento com hot reload
-npm run build        # Build para produção
-npm run start        # Inicia servidor de produção
 npm run db:generate  # Gera migrações
 npm run db:migrate   # Executa migrações
-npm run db:studio    # Interface visual do banco
+npm run db:seed      # Reseta e popula o banco (CTRL+C para parar)
 ```
 
 ### Frontend (`/website`)
@@ -148,7 +187,6 @@ npm run db:studio    # Interface visual do banco
 npm run dev          # Servidor de desenvolvimento
 npm run build        # Build para produção
 npm run preview      # Preview do build de produção
-npm run lint         # Executa ESLint
 ```
 
 ## 📁 Estrutura do Projeto
@@ -231,10 +269,6 @@ const { questionId } = await response.json();
 ```bash
 # Backend
 cd server
-npm run test
-
-# Frontend  
-cd website
 npm run test
 ```
 

@@ -10,7 +10,7 @@ export const deleteRoomRoute: FastifyPluginCallbackZod = (app) => {
     {
       schema: {
         params: z.object({
-          roomId: z.string().uuid(),
+          roomId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
         }),
       },
     },

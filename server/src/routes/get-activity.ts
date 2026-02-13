@@ -10,7 +10,7 @@ export const getActivityRoute: FastifyPluginCallbackZod = (app) => {
     {
       schema: {
         params: z.object({
-          activityId: z.string(),
+          activityId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
         }),
       },
     },

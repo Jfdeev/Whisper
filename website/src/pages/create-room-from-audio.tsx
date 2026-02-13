@@ -269,7 +269,7 @@ export function CreateRoomFromAudio() {
                                         <Button
                                             onClick={resetRecording}
                                             variant="outline"
-                                            className="px-6 py-2 from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white shadow-lg"
+                                            className="px-6 py-2 border-gray-300 text-gray-700 hover:bg-gray-100"
                                         >
                                             Gravar novamente
                                         </Button>

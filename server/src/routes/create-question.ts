@@ -9,7 +9,7 @@ export const createQuestionRoute: FastifyPluginCallbackZod = (app) => {
     app.post('/questions', {
         schema: {
             body: z.object({
-                roomId: z.string().uuid(),
+                roomId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
                 question: z.string().min(1, { message: 'Question is required' }),
             })
         },

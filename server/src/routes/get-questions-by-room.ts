@@ -7,7 +7,7 @@ import { eq, desc } from "drizzle-orm";
 export const getQuestionsByRoomRoute: FastifyPluginAsyncZod = async (app) => {
   app.get('/rooms/:roomId/questions', async (request, reply) => {
     const paramsSchema = z.object({
-      roomId: z.string().uuid(),
+      roomId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
     });
     const params = paramsSchema.parse(request.params);
 

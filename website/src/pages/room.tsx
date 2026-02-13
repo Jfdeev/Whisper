@@ -297,7 +297,7 @@ export function Room() {
             </div>
             
             <div className="flex items-center space-x-4">
-              <Link to={`/room/${roomId}/record-audio`}>
+              <Link to={`/audio/${roomId}`}>
                 <Button 
                   variant="outline"
                   className="flex items-center space-x-2 border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"

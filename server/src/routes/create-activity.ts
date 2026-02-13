@@ -11,7 +11,7 @@ export const createActivityRoute: FastifyPluginCallbackZod = (app) => {
     {
       schema: {
         params: z.object({
-          roomId: z.string(),
+          roomId: z.string().regex(/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i),
         }),
       },
     },
